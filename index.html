@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrameRateX - The Future of Gaming Performance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dynamic-background-container">
+        <div class="bg-energy-gradient"></div>
+        <div class="bg-layer layer-1"></div> 
+        <div class="bg-layer layer-2"></div>
+        <div class="bg-layer layer-3"></div>
+        <div class="bg-grid-overlay"></div>
+        <div class="particles-container">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="neon-aurora top-left"></div>
+        <div class="neon-aurora top-right"></div>
+        <div class="neon-aurora bottom-left"></div>
+        <div class="neon-aurora bottom-right"></div>
+
+        <div class="bg-specific-component bg-component-cpu"></div>
+        <div class="bg-specific-component bg-component-ram"></div>
+        <div class="bg-specific-component bg-component-mobo"></div>
+    </div>
+
+    <div id="mouse-glow-follower"></div>
+    <div class="static-overlay"></div>
+
+    <main class="main-content">
+        <header>
+            <h1 class="neon-text glitch-text header-glow-hover initial-typing-effect" id="main-title">FrameRateX_</h1>
+            <p class="subtitle glitch-text" id="subtitle-text">Your future in gaming performance starts here.</p>
+        </header>
+
+        <section class="action-section glassmorphism active">
+            <h2 class="neon-text">Build Your Rig & Predict Performance</h2>
+            
+            <div class="input-group">
+                <label for="cpu-brand" class="neon-text">CPU Brand:</label>
+                <select id="cpu-brand" class="neon-select">
+                    <option value="">Select CPU Brand</option>
+                </select>
+            </div>
+            
+            <div class="input-group hidden">
+                <label for="cpu-series" class="neon-text">CPU Series:</label>
+                <select id="cpu-series" class="neon-select">
+                    <option value="">Select CPU Series</option>
+                </select>
+            </div>
+            
+            <div class="input-group hidden">
+                <label for="cpu-gen" class="neon-text">CPU Generation:</label>
+                <select id="cpu-gen" class="neon-select">
+                    <option value="">Select CPU Generation</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="cpu-suffix" class="neon-text">CPU Suffix:</label>
+                <select id="cpu-suffix" class="neon-select">
+                    <option value="">Select CPU Suffix</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="gpu-brand" class="neon-text">GPU Brand:</label>
+                <select id="gpu-brand" class="neon-select">
+                    <option value="">Select GPU Brand</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="gpu-series" class="neon-text">GPU Series:</label>
+                <select id="gpu-series" class="neon-select">
+                    <option value="">Select GPU Series</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="gpu-model-series" class="neon-text">GPU Model Series:</label>
+                <select id="gpu-model-series" class="neon-select">
+                    <option value="">Select GPU Model Series</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="gpu-model" class="neon-text">GPU Model:</label>
+                <select id="gpu-model" class="neon-select">
+                    <option value="">Select GPU Model</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="ram-size" class="neon-text">RAM Size (GB):</label>
+                <select id="ram-size" class="neon-select">
+                    <option value="">Select RAM Size</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="ram-type" class="neon-text">RAM Type:</label>
+                <select id="ram-type" class="neon-select">
+                    <option value="">Select RAM Type</option>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="mobo-brand" class="neon-text">Motherboard Brand:</label>
+                <select id="mobo-brand" class="neon-select">
+                    <option value="">Select Motherboard Brand</sselect>
+                </select>
+            </div>
+
+            <div class="input-group hidden">
+                <label for="mobo-model" class="neon-text">Motherboard Model:</label>
+                <select id="mobo-model" class="neon-select">
+                    <option value="">Select Motherboard Model</option>
+                </select>
+            </div>
+
+            <button id="analyzeButton" class="neon-button pulse-glow">
+                <span class="button-text">Analyze Performance</span>
+                <span class="button-inner-glow"></span>
+                <span class="button-energy-burst"></span>
+            </button>
+        </section>
+
+        <div class="loader-placeholder">
+            <div class="loader-content glassmorphism">
+                <p class="neon-text loader-status-message">Analyzing your system...</p>
+                <div class="loading-animation-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+
+        <section class="results-display">
+            <h2 class="neon-text glitch-text">Expected Performance Results</h2>
+            <div class="results-table-container glassmorphism">
+                <table class="fps-table">
+                    <thead>
+                        <tr>
+                            <th class="table-header-glow">Game</th>
+                            <th class="table-header-glow">1080p</th>
+                            <th class="table-header-glow">2K</th>
+                            <th class="table-header-glow">4K</th>
+                            <th class="table-header-glow">Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-game-id="gta5">
+                            <td>GTA V</td>
+                            <td><span class="fps-value high-fps" data-target-fps="230">0</span></td>
+                            <td><span class="fps-value mid-fps" data-target-fps="120">0</span></td>
+                            <td><span class="fps-value low-fps" data-target-fps="60">0</span></td>
+                            <td><span class="rating-text high-fps">Excellent</span></td>
+                        </tr>
+                        <tr data-game-id="cyberpunk">
+                            <td>Cyberpunk 2077</td>
+                            <td><span class="fps-value high-fps" data-target-fps="100">0</span></td>
+                            <td><span class="fps-value mid-fps" data-target-fps="70">0</span></td>
+                            <td><span class="fps-value low-fps" data-target-fps="45">0</span></td>
+                            <td><span class="rating-text mid-fps">Good</span></td>
+                        </tr>
+                        <tr data-game-id="fortnite">
+                            <td>Fortnite</td>
+                            <td><span class="fps-value high-fps" data-target-fps="240">0</span>+</td>
+                            <td><span class="fps-value high-fps" data-target-fps="180">0</span></td>
+                            <td><span class="fps-value mid-fps" data-target-fps="100">0</span></td>
+                            <td><span class="rating-text high-fps">Ideal</span></td>
+                        </tr>
+                        <tr data-game-id="rdr2">
+                            <td>Red Dead Redemption 2</td>
+                            <td><span class="fps-value high-fps" data-target-fps="95">0</span></td>
+                            <td><span class="fps-value mid-fps" data-target-fps="65">0</span></td>
+                            <td><span class="fps-value low-fps" data-target-fps="35">0</span></td>
+                            <td><span class="rating-text low-fps">Playable</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div class="system-status-indicator neon-text">
+        SYSTEM STATUS: <span class="status-dot"></span> ONLINE
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
