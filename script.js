@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ramData = {
         "2": ["DDR3"], "4": ["DDR3", "DDR4"], "6": ["DDR3", "DDR4"], "8": ["DDR3", "DDR4", "DDR5"],
         "10": ["DDR3", "DDR4", "DDR5"], "12": ["DDR3", "DDR4", "DDR5"], "16": ["DDR3", "DDR4", "DDR5"],
-        "18": ["DDR4", "DDR5"], "20": ["DDR4", "DDR5"], "24": ["DDR4", "DDR5"],
+        "18": ["DDR4", "DDR5"], "20": ["DDR3", "DDR4", "DDR5"], "24": ["DDR4", "DDR5"], // Added DDR3 to 20/24 for more flexibility
         "26": ["DDR4", "DDR5"], "28": ["DDR4", "DDR5"], "30": ["DDR4", "DDR5"],
         "32": ["DDR4", "DDR5"], "64": ["DDR4", "DDR5"], "128": ["DDR5"]
     };
@@ -110,111 +110,63 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    // --- NEW: Performance Prediction Data (Simulated) ---
-    // Structure: GPU Model -> CPU Tier -> RAM Tier -> { Game: { 1080p, 2K, 4K, Rating } }
-    // Define CPU Tiers and RAM Tiers clearly
-    // CPU tiers map to selected CPU Brand and Series/Gen
-    // RAM tiers map to RAM Size and Type
-    const performancePredictions = {
-        // --- High-End GPUs (RTX 4090, RTX 5090, RX 7900 XTX) ---
-        "RTX 4090": { 
-            "High-End CPU": { // e.g., Core i9 13th/14th Gen, Ryzen 9 7000/8000
-                "High-End DDR5": { // 32GB+ DDR5
-                    "GTA V": { "1080p": "200+", "2K": "160-180", "4K": "100-120", "Rating": "Elite" },
-                    "Cyberpunk 2077": { "1080p": "120-140", "2K": "85-100", "4K": "60-75", "Rating": "Excellent" },
-                    "Fortnite": { "1080p": "300+", "2K": "240+", "4K": "180+", "Rating": "Overkill" },
-                    "Red Dead Redemption 2": { "1080p": "150-170", "2K": "110-130", "4K": "70-85", "Rating": "Excellent" }
-                },
-                "Standard DDR5": { // 16GB-30GB DDR5
-                    "GTA V": { "1080p": "190+", "2K": "150-170", "4K": "95-115", "Rating": "Elite" },
-                    "Cyberpunk 2077": { "1080p": "110-130", "2K": "80-95", "4K": "55-70", "Rating": "Excellent" }
-                }
-            },
-            "Mid-Range CPU": { // e.g., Core i7 12th/13th, Ryzen 7 5000/7000
-                "High-End DDR5": {
-                    "GTA V": { "1080p": "180+", "2K": "140-160", "4K": "90-110", "Rating": "Excellent" },
-                    "Cyberpunk 2077": { "1080p": "110-130", "2K": "75-90", "4K": "50-65", "Rating": "Very Good" }
-                }
-            }
+    // --- NEW: Performance Scoring Data (Simulated Procedural Calculation) ---
+    // This defines base scores for each component model/tier.
+    const componentScores = {
+        // GPU Base Scores (Higher is better)
+        "GPUs": {
+            "RTX 5090": 1000, "RTX 5080 Ti": 950, "RTX 5080": 900, "RTX 5070 Ti": 850, "RTX 5070": 800, "RTX 5060 Ti": 750, "RTX 5060": 700,
+            "RTX 4090": 900, "RTX 4080 Super": 820, "RTX 4080": 800, "RTX 4070 Ti Super": 750, "RTX 4070 Super": 700, "RTX 4070 Ti": 680, "RTX 4070": 650, "RTX 4060 Ti": 500, "RTX 4060": 450,
+            "RTX 3090 Ti": 700, "RTX 3090": 680, "RTX 3080 Ti": 650, "RTX 3080": 600, "RTX 3070 Ti": 550, "RTX 3070": 500, "RTX 3060 Ti": 400, "RTX 3060": 350,
+            "RTX 2080 Ti": 450, "RTX 2080 Super": 400, "RTX 2080": 380, "RTX 2070 Super": 350, "RTX 2070": 320, "RTX 2060 Super": 280, "RTX 2060": 250,
+            "GTX 1660 Super": 150, "GTX 1660 Ti": 140, "GTX 1660": 130, "GTX 1650 Super": 100, "GTX 1650": 90,
+            "GTX 1080 Ti": 200, "GTX 1080": 180, "GTX 1070 Ti": 160, "GTX 1070": 140, "GTX 1060 (6GB)": 100, "GTX 1060 (3GB)": 80, "GTX 1050 Ti": 60, "GTX 1050": 50,
+            "RX 7900 XTX": 880, "RX 7900 XT": 800, "RX 7800 XT": 700, "RX 7700 XT": 600, "RX 7600": 480,
+            "RX 6900 XT": 650, "RX 6800 XT": 600, "RX 6800": 550, "RX 6750 XT": 520, "RX 6700 XT": 500, "RX 6650 XT": 420, "RX 6600 XT": 400, "RX 6600": 380,
+            "RX 5700 XT": 300, "RX 5700": 280, "RX 5600 XT": 220, "RX 5500 XT": 120, "RX 5500": 100,
+            "RX Vega 64": 180, "RX Vega 56": 160
         },
-        "RTX 5090": { // Placeholder for new series
-            "High-End CPU": {
-                "High-End DDR5": {
-                    "GTA V": { "1080p": "250+", "2K": "200+", "4K": "130-150", "Rating": "Ultimate" },
-                    "Cyberpunk 2077": { "1080p": "150-170", "2K": "100-120", "4K": "75-90", "Rating": "Ultimate" }
-                }
-            }
+        // CPU Tier Multipliers
+        "CPUs": {
+            "High-End CPU": 1.0, // Base multiplier for high-end CPU
+            "Mid-Range CPU": 0.90, // Mid-range CPUs might reduce overall score by 10%
+            "Budget CPU": 0.70,   // Budget CPUs might reduce overall score by 30%
+            "Unknown CPU": 0.95   // Fallback multiplier
         },
-        "RX 7900 XTX": {
-            "High-End CPU": {
-                "High-End DDR5": {
-                    "GTA V": { "1080p": "180+", "2K": "150+", "4K": "90-110", "Rating": "Elite" }, 
-                    "Cyberpunk 2077": { "1080p": "110-130", "2K": "80-95", "4K": "50-65", "Rating": "Excellent" }
-                }
-            }
-        },
-
-        // --- Mid-Range GPUs (RTX 3070, RTX 4060, RX 6700 XT) ---
-        "RTX 3070": {
-            "Mid-Range CPU": { 
-                "Standard DDR4": { 
-                    "GTA V": { "1080p": "90-110", "2K": "60-75", "4K": "30-40", "Rating": "Good" },
-                    "Cyberpunk 2077": { "1080p": "50-65", "2K": "35-45", "4K": "20-30", "Rating": "Playable" },
-                    "Fortnite": { "1080p": "180-220", "2K": "120-150", "4K": "60-80", "Rating": "Very Good" },
-                    "Red Dead Redemption 2": { "1080p": "65-80", "2K": "45-55", "4K": "25-35", "Rating": "Good" }
-                },
-                "Standard DDR5": { 
-                    "GTA V": { "1080p": "95-115", "2K": "65-80", "4K": "35-45", "Rating": "Very Good" }
-                }
-            }
-        },
-        "RTX 4060": {
-            "Mid-Range CPU": {
-                "Standard DDR4": {
-                    "GTA V": { "1080p": "100-120", "2K": "70-85", "4K": "40-50", "Rating": "Very Good" }
-                }
-            },
-            "High-End CPU": { // Example for higher CPU with this GPU
-                 "Standard DDR5": {
-                    "GTA V": { "1080p": "110-130", "2K": "75-90", "4K": "45-55", "Rating": "Excellent" }
-                }
-            }
-        },
-        "RX 6700 XT": {
-            "Mid-Range CPU": {
-                "Standard DDR4": {
-                    "GTA V": { "1080p": "95-115", "2K": "65-80", "4K": "35-45", "Rating": "Good" }
-                }
-            }
-        },
-
-        // --- Entry-Level GPUs (GTX 1660 Super, RX 5500 XT) ---
-        "GTX 1660 Super": {
-            "Budget CPU": { 
-                "Standard DDR4": { 
-                    "GTA V": { "1080p": "60-70", "2K": "40-50", "4K": "---", "Rating": "Basic" },
-                    "Cyberpunk 2077": { "1080p": "30-40", "2K": "---", "4K": "---", "Rating": "Entry" },
-                    "Fortnite": { "1080p": "90-120", "2K": "50-70", "4K": "30-40", "Rating": "Good" },
-                    "Red Dead Redemption 2": { "1080p": "45-55", "2K": "30-40", "4K": "---", "Rating": "Basic" }
-                }
-            }
-        },
-        "RX 5500 XT": {
-            "Budget CPU": {
-                "Standard DDR4": {
-                    "GTA V": { "1080p": "55-65", "2K": "35-45", "4K": "---", "Rating": "Basic" }
-                }
-            }
-        },
-
-        // --- Default/Fallback performance if combination not found ---
-        "default": { // Used if no specific GPU tier matches
-            "GTA V": { "1080p": "N/A", "2K": "N/A", "4K": "N/A", "Rating": "Unknown" },
-            "Cyberpunk 2077": { "1080p": "N/A", "2K": "N/A", "4K": "N/A", "Rating": "Unknown" },
-            "Fortnite": { "1080p": "N/A", "2K": "N/A", "4K": "N/A", "Rating": "Unknown" },
-            "Red Dead Redemption 2": { "1080p": "N/A", "2K": "N/A", "4K": "N/A", "Rating": "Unknown" }
+        // RAM Tier Multipliers
+        "RAMs": {
+            "High-End DDR5": 1.08, // 32GB+ DDR5
+            "Standard DDR5": 1.05, // 16GB-30GB DDR5
+            "Low-End DDR5": 1.02,  // <16GB DDR5
+            "High-Capacity DDR4": 0.98, // 32GB+ DDR4
+            "Standard DDR4": 0.95, // 16GB-30GB DDR4
+            "Low-End DDR4": 0.90,  // <16GB DDR4
+            "Legacy DDR3": 0.80,   // DDR3
+            "Unknown RAM": 1.00    // Fallback
         }
     };
+
+    // Game Difficulty Multipliers (Higher factor means lower final FPS from raw score)
+    // Adjusted these multipliers slightly to get more varied and higher FPS results with base scores
+    const gameDifficultyFactors = {
+        "Cyberpunk 2077": { "1080p": 0.30, "2K": 0.20, "4K": 0.10 }, // Adjusted
+        "Red Dead Redemption 2": { "1080p": 0.35, "2K": 0.25, "4K": 0.15 }, // Adjusted
+        "GTA V": { "1080p": 0.45, "2K": 0.35, "4K": 0.25 }, // Adjusted
+        "Fortnite": { "1080p": 0.50, "2K": 0.40, "4K": 0.30 } // Adjusted
+        // Add more games here
+    };
+
+    // Define FPS output tiers based on calculated raw score range
+    const fpsOutputTiers = [
+        { score: 800, rating: "Ultimate", fps: { "1080p": "250-350+", "2K": "180-250+", "4K": "110-150+" } },
+        { score: 600, rating: "Elite", "fps": { "1080p": "180-250", "2K": "130-180", "4K": "75-100" } },
+        { score: 400, rating: "Excellent", "fps": { "1080p": "140-180", "2K": "90-130", "4K": "50-70" } },
+        { score: 250, rating: "Very Good", "fps": { "1080p": "100-140", "2K": "60-90", "4K": "35-50" } },
+        { score: 150, rating: "Good", "fps": { "1080p": "70-100", "2K": "40-60", "4K": "25-35" } },
+        { score: 80, rating: "Playable", "fps": { "1080p": "45-70", "2K": "25-40", "4K": "---" } },
+        { score: 30, rating: "Basic", "fps": { "1080p": "30-45", "2K": "---", "4K": "---" } },
+        { score: 0, rating: "Entry", "fps": { "1080p": "15-30", "2K": "---", "4K": "---" } }
+    ];
 
 
     // --- Mouse Glow Variables and Animation Loop ---
@@ -660,53 +612,54 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Determined RAM Tier:", ramTier);
 
 
-        // --- Lookup Performance Predictions based on Tiers (Revised Logic) ---
-        let predictionData = null; // Initialize as null to clearly track if found or not
-        const gpuModelKey = selectedGpuModel; // Correctly defined and available here.
+        // --- NEW: Perform Score-Based Prediction ---
+        let predictedPerformanceResults = {}; // Initialize as an empty object for the final results
+        
+        const gpuBaseScore = componentScores.GPUs[selectedGpuModel] || 0; // Get base score for selected GPU. Default to 0 if not found.
+        const cpuMultiplier = componentScores.CPUs[cpuTier] || 1.0; // Get multiplier for CPU tier. Default to 1.0 if not found.
+        const ramMultiplier = componentScores.RAMs[ramTier] || 1.0; // Get multiplier for RAM tier. Default to 1.0 if not found.
 
-        try {
-            const gpuEntry = performancePredictions[gpuModelKey]; // Get the entry for the specific GPU model
+        const baseSystemScore = gpuBaseScore * cpuMultiplier * ramMultiplier;
+        console.log(`Calculated Base System Score: ${baseSystemScore.toFixed(2)} (GPU: ${gpuBaseScore}, CPU_Mod: ${cpuMultiplier}, RAM_Mod: ${ramMultiplier})`);
 
-            if (gpuEntry) {
-                const cpuEntry = gpuEntry[cpuTier]; // Get the entry for the determined CPU tier
 
-                // Attempt 1: Full match (GPU + CPU Tier + RAM Tier)
-                if (cpuEntry && cpuEntry[ramTier]) {
-                    predictionData = cpuEntry[ramTier];
-                    console.log("✅ Found Full Match (GPU + CPU Tier + RAM Tier):", predictionData);
-                } 
-                // Fallback 1: GPU + CPU Tier (any RAM tier)
-                else if (cpuEntry) {
-                    const availableRamTiers = Object.values(cpuEntry);
-                    if (availableRamTiers.length > 0) {
-                        predictionData = availableRamTiers[0]; // Get the first available RAM tier prediction
-                        console.warn("⚠️ No exact RAM tier match, using fallback RAM tier from CPU tier match.", predictionData);
-                    }
-                } 
-                // Fallback 2: GPU only (any CPU/RAM tier under that GPU)
-                else { // No exact CPU tier match
-                    const availableCpuTiers = Object.values(gpuEntry); // Get all CPU tiers under this GPU
-                    for (const cpuTierData of availableCpuTiers) {
-                        const ramTiers = Object.values(cpuTierData); // Get all RAM tiers under this CPU tier
-                        if (ramTiers.length > 0) {
-                            predictionData = ramTiers[0]; // Get the first available RAM tier prediction from this CPU tier
-                            console.warn("⚠️ No exact CPU tier match, using fallback CPU/RAM tier from GPU match.", predictionData);
-                            break; // Found a fallback, exit loop
+        // Generate predictions for each game in the table
+        // Use an array of game names from the table or define them here for consistency
+        const gameNamesInTable = ["GTA V", "Cyberpunk 2077", "Fortnite", "Red Dead Redemption 2"]; // Ensure this matches your HTML table
+        
+        for (const game of gameNamesInTable) {
+            const difficultyFactors = gameDifficultyFactors[game];
+            let gamePrediction = { "1080p": "N/A", "2K": "N/A", "4K": "N/A", "Rating": "Unknown" }; // Default for current game
+
+            if (difficultyFactors) {
+                // Adjust score based on game difficulty and resolution
+                const score1080p = baseSystemScore * difficultyFactors["1080p"];
+                const score2k = baseSystemScore * difficultyFactors["2K"];
+                const score4k = baseSystemScore * difficultyFactors["4K"];
+
+                // Find appropriate FPS tier for each resolution
+                const findFpsTier = (score) => {
+                    for (const tier of fpsOutputTiers) {
+                        if (score >= tier.score) {
+                            return tier;
                         }
                     }
-                }
-            }
+                    return fpsOutputTiers[fpsOutputTiers.length - 1]; // Return lowest tier if score is too low
+                };
 
-            // Final Fallback: If predictionData is still null (no GPU match or all lookups failed), use the global default
-            if (!predictionData) {
-                predictionData = performancePredictions["default"];
-                console.warn("⚠️ Used global default prediction due to no matching GPU entry or no valid tier fallbacks.");
-            }
+                const tier1080p = findFpsTier(score1080p);
+                const tier2k = findFpsTier(score2k);
+                const tier4k = findFpsTier(score4k);
 
-        } catch (error) {
-            console.error("❌ Error during prediction lookup/fallback process:", error);
-            predictionData = performancePredictions["default"]; // Fallback on any unexpected error during lookup
+                gamePrediction["1080p"] = tier1080p.fps["1080p"];
+                gamePrediction["2K"] = tier2k.fps["2K"];
+                gamePrediction["4K"] = tier4k.fps["4K"];
+                gamePrediction["Rating"] = tier1080p.rating; // Base rating on 1080p performance tier
+            }
+            predictedPerformanceResults[game] = gamePrediction;
         }
+        
+        console.log("Final Predicted Results per Game:", predictedPerformanceResults);
 
 
         // Trigger loading animation
@@ -760,11 +713,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 resultsDisplay.classList.remove('shake-on-appear');
             }, { once: true });
 
-            // Populate and animate FPS in the table using predictionData
+            // Populate and animate FPS in the table using calculated predictedPerformanceResults
             fpsTableRows.forEach((row, rowIndex) => {
                 const gameName = row.querySelector('td:first-child').textContent;
-                // Ensure gamePredictions is found for the specific game or falls back to default game data
-                const gamePredictions = predictionData[gameName] || (performancePredictions["default"] ? performancePredictions["default"][gameName] : null); 
+                const gamePredictions = predictedPerformanceResults[gameName]; 
 
                 row.style.opacity = '0';
                 row.style.transform = 'translateY(20px)';
@@ -772,54 +724,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.style.opacity = '1';
                     row.style.transform = 'translateY(0)';
                     
-                    // Update FPS values for each resolution
                     const fps1080pElement = row.querySelector('td:nth-child(2) span');
                     const fps2kElement = row.querySelector('td:nth-child(3) span');
                     const fps4kElement = row.querySelector('td:nth-child(4) span');
                     const ratingElement = row.querySelector('td:nth-child(5) span'); 
 
-                    if (fps1080pElement && gamePredictions && gamePredictions["1080p"]) {
+                    if (gamePredictions) {
                         animateFpsNumber(fps1080pElement, gamePredictions["1080p"]);
-                    } else if (fps1080pElement) { 
-                         fps1080pElement.textContent = "N/A";
-                         fps1080pElement.classList.remove('high-fps', 'mid-fps', 'low-fps');
-                         fps1080pElement.classList.add('unavailable-fps');
-                    }
-
-                    if (fps2kElement && gamePredictions && gamePredictions["2K"]) {
                         animateFpsNumber(fps2kElement, gamePredictions["2K"]);
-                    } else if (fps2kElement) {
-                        fps2kElement.textContent = "N/A";
-                        fps2kElement.classList.remove('high-fps', 'mid-fps', 'low-fps');
-                        fps2kElement.classList.add('unavailable-fps');
-                    }
-
-                    if (fps4kElement && gamePredictions && gamePredictions["4K"]) {
                         animateFpsNumber(fps4kElement, gamePredictions["4K"]);
-                    } else if (fps4kElement) {
-                        fps4kElement.textContent = "N/A";
-                        fps4kElement.classList.remove('high-fps', 'mid-fps', 'low-fps');
-                        fps4kElement.classList.add('unavailable-fps');
-                    }
-                    
-                    if (ratingElement && gamePredictions && gamePredictions["Rating"]) {
-                        ratingElement.textContent = gamePredictions["Rating"];
-                        ratingElement.classList.remove('high-fps', 'mid-fps', 'low-fps', 'unavailable-fps');
-                        if (gamePredictions["Rating"].includes("Ultimate")) { 
-                            ratingElement.classList.add('high-fps'); 
-                        } else if (gamePredictions["Rating"].includes("Elite") || gamePredictions["Rating"].includes("Excellent") || gamePredictions["Rating"].includes("Ideal") || gamePredictions["Rating"].includes("Overkill")) {
-                            ratingElement.classList.add('high-fps');
-                        } else if (gamePredictions["Rating"].includes("Good") || gamePredictions["Rating"].includes("Very Good") || gamePredictions["Rating"].includes("Playable")) {
-                            ratingElement.classList.add('mid-fps');
-                        } else if (gamePredictions["Rating"].includes("Basic") || gamePredictions["Rating"].includes("Entry")) {
-                            ratingElement.classList.add('low-fps');
-                        } else { 
-                            ratingElement.classList.add('unavailable-fps');
-                        }
-                    } else if (ratingElement) {
-                        ratingElement.textContent = "N/A";
-                        ratingElement.classList.remove('high-fps', 'mid-fps', 'low-fps');
-                        ratingElement.classList.add('unavailable-fps');
+                        animateFpsNumber(ratingElement, gamePredictions["Rating"]); // Pass rating text directly
+                    } else { // Fallback if for some reason a game prediction isn't generated
+                        fps1080pElement.textContent = "N/A"; fps1080pElement.classList.add('unavailable-fps');
+                        fps2kElement.textContent = "N/A"; fps2kElement.classList.add('unavailable-fps');
+                        fps4kElement.textContent = "N/A"; fps4kElement.classList.add('unavailable-fps');
+                        ratingElement.textContent = "Unknown"; ratingElement.classList.add('unavailable-fps');
                     }
 
                 }, 500 + (rowIndex * 200));
